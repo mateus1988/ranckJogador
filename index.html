@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Ranking de Jogadores</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #1e3c72;
+    color: white;
+    text-align: center;
+}
+
+.container {
+    background: white;
+    color: black;
+    padding: 20px;
+    margin: 20px auto;
+    width: 450px;
+    border-radius: 10px;
+}
+
+input {
+    width: 90%;
+    padding: 8px;
+    margin: 5px;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.ranking {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.top1 {
+    background: gold;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.delete {
+    background: red;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>⚽ Ranking de Jogadores</h2>
+
+<input id="nome" placeholder="Nome do jogador">
+<input id="partidas" type="number" placeholder="Partidas jogadas">
+<input id="gols" type="number" placeholder="Gols">
+<input id="assistencias" type="number" placeholder="Assistências">
+
+<br>
+<button onclick="adicionar()">Adicionar</button>
+<button onclick="limparTudo()" class="delete">Limpar Ranking</button>
+
+<div class="ranking" id="ranking"></div>
+
+<canvas id="grafico"></canvas>
+</div>
+
+<script>
+
+let jogadores = [];
+
+function adicionar() {
+
+    let nome = document.getElementById("nome").value;
+    let partidas = parseInt(document.getElementById("partidas").value);
+    let gols = parseInt(document.getElementById("gols").value);
+    let assistencias = parseInt(document.getElementById("assistencias").value);
+
+    if (!nome || isNaN(partidas) || isNaN(gols) || isNaN(assistencias)) {
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    let pontuacao = gols + (assistencias * 0.5);
+    let media = partidas === 0 ? 0 : pontuacao / partidas;
+
+    jogadores.push({ nome, partidas, gols, assistencias, pontuacao, media });
+
+    limparCampos();
+
+    atualizarRanking();
+    gerarGrafico();
+}
+
+function atualizarRanking() {
+
+    if (jogadores.length === 0) {
+        document.getElementById("ranking").innerHTML = "Nenhum jogador cadastrado!";
+        return;
+    }
+
+    jogadores.sort((a, b) => {
+        if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
+        if (a.partidas !== b.partidas) return a.partidas - b.partidas;
+        return b.gols - a.gols;
+    });
+
+    let html = "<h3>🏆 Ranking Atual</h3>";
+    html += `<p>Total de jogadores: ${jogadores.length}</p>`;
+
+    jogadores.forEach((j, i) => {
+
+        let destaque = i === 0 ? "top1" : "";
+
+        let fraseCampeao = "";
+
+        if (i === 0) {
+            fraseCampeao = `
+            <p style="color:green; font-weight:bold;">
+            🥇 Tá voando! O melhor da resenha no momento… só não pode pipocar no próximo jogo kkkkk ⚽🔥
+            </p>
+            `;
+        }
+
+        html += `
+        <div class="${destaque}">
+            <strong>${i + 1}º lugar - ${j.nome}</strong><br>
+            ⚽ Gols: ${j.gols} |
+            🎯 Assistências: ${j.assistencias} |
+            🎮 Partidas: ${j.partidas}<br>
+            ⭐ Pontuação: ${j.pontuacao} |
+            📊 Média: ${j.media.toFixed(2)}
+            ${fraseCampeao}
+            <button onclick="remover(${i})" class="delete">Remover</button>
+        </div><br>
+        `;
+    });
+
+    document.getElementById("ranking").innerHTML = html;
+}
+
+// 🔥 remover jogador
+function remover(index) {
+    jogadores.splice(index, 1);
+    atualizarRanking();
+    gerarGrafico();
+}
+
+// 🔥 limpar ranking
+function limparTudo() {
+    jogadores = [];
+    atualizarRanking();
+    gerarGrafico();
+}
+
+// 🔥 "API interna"
+function getDadosGrafico() {
+    return {
+        labels: jogadores.map(j => j.nome),
+        data: jogadores.map(j => j.media)
+    };
+}
+
+let chart;
+
+function gerarGrafico() {
+
+    let ctx = document.getElementById("grafico").getContext("2d");
+
+    if (chart) chart.destroy();
+
+    if (jogadores.length === 0) return;
+
+    let dados = getDadosGrafico();
+
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dados.labels,
+            datasets: [{
+                label: 'Média dos Jogadores',
+                data: dados.data
+            }]
+        }
+    });
+}
+
+function limparCampos() {
+    document.getElementById("nome").value = "";
+    document.getElementById("partidas").value = "";
+    document.getElementById("gols").value = "";
+    document.getElementById("assistencias").value = "";
+}
+
+</script>
+
+</body>
+</html>
