@@ -1,12 +1,13 @@
 ﻿# ⚽ Sistema de Ranking de Jogadores
 
 ## 📌 Descrição
-Este projeto foi desenvolvidocom o objetivo de ranquear jogadores( amigos da resenha) com base em seu desempenho em campo.
+Este projeto foi desenvolvido com o objetivo de ranquear jogadores( amigos da resenha) com base em seu desempenho em campo ou quadra .
 
 O sistema utiliza os seguintes dados:
 - ⚽ Gols
 - 🎯 Assistências
 - 🕹️ Partidas jogadas
+- Jogos Jogados
 
 Além disso, o projeto conta com integração de API para exibir data e hora em tempo real e uma tabela com gráfico comparativo entre jogadores.
 
